@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/conao3/go-glisp/lexer"
+	"github.com/conao3/go-glisp/repl"
 )
 
 func main() {
 	fmt.Println("Hello, playground")
-	fmt.Println(lexer.New("Hoge"))
+	repl.Start(os.Stdin, os.Stdout)
 }
