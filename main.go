@@ -12,7 +12,7 @@ func main() {
 	var (
 		stageReader    bool
 		stageEvaluator bool
-		Input 		string
+		Input          string
 	)
 	flag.BoolVar(&stageReader, "sr", false, "reader stage")
 	flag.BoolVar(&stageEvaluator, "se", false, "evaluator stage")

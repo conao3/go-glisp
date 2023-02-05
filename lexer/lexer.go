@@ -4,7 +4,7 @@ type Lexer struct {
 	input        string
 	position     int
 	readPosition int
-	chr 		 byte
+	chr          byte
 }
 
 func New(input string) *Lexer {

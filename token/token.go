@@ -11,8 +11,8 @@ const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
 
-	LPAREN  = "("
-	RPAREN  = ")"
+	LPAREN = "("
+	RPAREN = ")"
 
 	FUNCTION = "FUNCTION"
 )
@@ -21,7 +21,7 @@ type Tokenizer struct {
 	input        string
 	position     int
 	readPosition int
-	chr 		 byte
+	chr          byte
 }
 
 func New(input string) *Tokenizer {

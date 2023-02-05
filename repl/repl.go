@@ -3,8 +3,8 @@ package repl
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"github.com/conao3/go-glisp/reader"
+	"io"
 )
 
 const PROMPT = "glisp> "
@@ -34,9 +34,10 @@ func Start(in io.Reader, out io.Writer, stage Stage) {
 
 		line := scanner.Text()
 		r := reader.New(line)
+		exp := r.Read()
 
 		if stage == StageReader {
-			fmt.Printf("%+v\n", r)
+			fmt.Printf("%+v\n", exp)
 		}
 
 		if stage == StageEvaluator {
