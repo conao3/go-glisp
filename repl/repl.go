@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"github.com/conao3/go-glisp/token"
+	"github.com/conao3/go-glisp/reader"
 )
 
 const PROMPT = "glisp> "
@@ -13,15 +13,13 @@ type Stage int
 
 const (
 	StageDefault Stage = iota
-	StageTokenizer
-	StageLexer
 	StageReader
 	StageEvaluator
 )
 
 func Start(in io.Reader, out io.Writer, stage Stage) {
 	if stage == StageDefault {
-		stage = StageTokenizer
+		stage = StageReader
 	}
 
 	scanner := bufio.NewScanner(in)
@@ -35,13 +33,13 @@ func Start(in io.Reader, out io.Writer, stage Stage) {
 		}
 
 		line := scanner.Text()
-		t := token.New(line)
+		r := reader.New(line)
 
-		if stage == StageTokenizer {
-			fmt.Printf("%+v\n", t)
+		if stage == StageReader {
+			fmt.Printf("%+v\n", r)
 		}
 
-		if stage == StageLexer || stage == StageReader || stage == StageEvaluator {
+		if stage == StageEvaluator {
 			panic("not implemented")
 		}
 	}
