@@ -1,7 +1,5 @@
 package reader
 
-import "fmt"
-
 type Reader struct {
 	input        string
 	position     int
@@ -25,6 +23,15 @@ func (r *Reader) readChar() {
 	r.readPosition += 1
 }
 
+func (r *Reader) readList() []string {
+	var list []string
+	for r.chr != ')' {
+		list = append(list, r.readExpr()...)
+	}
+	r.readChar()  // skip ')'
+	return list
+}
+
 func (r *Reader) readSymbol() string {
 	pos := r.position
 	for GetSyntaxType(r.chr) == Constituent {
@@ -33,7 +40,7 @@ func (r *Reader) readSymbol() string {
 	return r.input[pos:r.position]
 }
 
-func (r *Reader) readExpr() string {
+func (r *Reader) readExpr() []string {
 	for r.chr != 0 {
 		switch GetSyntaxType(r.chr) {
 		case Invalid:
@@ -44,6 +51,10 @@ func (r *Reader) readExpr() string {
 			continue
 
 		case TerminatingMacro, NonTerminatingMacro:
+			if r.chr == '(' {
+				r.readChar()  // skip '('
+				return r.readList()
+			}
 			panic("got <macro>; not implemented")
 
 		case SingleEscape:
@@ -53,12 +64,12 @@ func (r *Reader) readExpr() string {
 			panic("got <multiple escape>; not implemented")
 
 		case Constituent:
-			return r.readSymbol()
+			return []string{r.readSymbol()}
 		}
 	}
 	panic("Unexpected EOF")
 }
 
-func (r *Reader) Read() string {
+func (r *Reader) Read() []string {
 	return r.readExpr()
 }
