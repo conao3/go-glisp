@@ -7,19 +7,6 @@ type Expr interface {
 	String() string
 }
 
-func (e *Expr) String() string {
-	switch e.(type) {
-	case *Int:
-		return fmt.Sprintf("%d", e.(Int).value)
-	case *Symbol:
-		return e.(Symbol).name
-	case *Cons:
-		return fmt.Sprintf("(%s . %s)", e.(Cons).car, e.(Cons).cdr)
-	default:
-		panic("Not implemented")
-	}
-}
-
 type Atom interface {
 	Expr
 	isAtom()
@@ -30,15 +17,32 @@ type Int struct {
 	value int
 }
 
+func (i *Int) isExpr() {}
+func (i *Int) isAtom() {}
+func (i *Int) String() string {
+	return fmt.Sprintf("%d", i.value)
+}
+
 type Symbol struct {
 	Atom
 	name string
+}
+
+func (s *Symbol) isExpr() {}
+func (s *Symbol) isAtom() {}
+func (s *Symbol) String() string {
+	return s.name
 }
 
 type Cons struct {
 	Expr
 	car Expr
 	cdr Expr
+}
+
+func (c *Cons) isExpr() {}
+func (c *Cons) String() string {
+	return fmt.Sprintf("(%s . %s)", c.car, c.cdr)
 }
 
 var (

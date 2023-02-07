@@ -26,17 +26,17 @@ func (r *Reader) readChar() {
 func (r *Reader) readList() Expr {
 	if r.chr == ')' {
 		r.readChar()  // skip ')'
-		return NIL
+		return &NIL
 	}
 
-	lst := Cons{car: r.readExpr(), cdr: NIL}
+	lst := &Cons{car: r.readExpr(), cdr: &NIL}
 	cur := lst
 	for r.chr != ')' {
-		cur.cdr = Cons{car: r.readExpr(), cdr: NIL}
-		cur = cur.cdr.(Cons)
+		cur.cdr = &Cons{car: r.readExpr(), cdr: &NIL}
+		cur = cur.cdr.(*Cons)
 	}
 	r.readChar()  // skip ')'
-	return &lst
+	return lst
 }
 
 func (r *Reader) readSymbol() Expr {
