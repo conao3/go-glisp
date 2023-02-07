@@ -1,6 +1,9 @@
 package reader
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+)
 
 type Expr interface {
 	isExpr()
@@ -42,7 +45,19 @@ type Cons struct {
 
 func (c *Cons) isExpr() {}
 func (c *Cons) String() string {
-	return fmt.Sprintf("(%s . %s)", c.car, c.cdr)
+	var buf bytes.Buffer
+	cur := c
+	fmt.Fprint(&buf, "(")
+	for {
+		fmt.Fprint(&buf, cur.car)
+		if cur.cdr == &NIL {
+			break
+		}
+		fmt.Fprint(&buf, " ")
+		cur = cur.cdr.(*Cons)
+	}
+	fmt.Fprint(&buf, ")")
+	return buf.String()
 }
 
 var (
