@@ -46,6 +46,6 @@ func (c *Cons) String() string {
 }
 
 var (
-	T = Symbol{name: "t"}
+	T   = Symbol{name: "t"}
 	NIL = Symbol{name: "nil"}
 )

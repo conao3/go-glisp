@@ -25,7 +25,7 @@ func (r *Reader) readChar() {
 
 func (r *Reader) readList() Expr {
 	if r.chr == ')' {
-		r.readChar()  // skip ')'
+		r.readChar() // skip ')'
 		return &NIL
 	}
 
@@ -35,7 +35,7 @@ func (r *Reader) readList() Expr {
 		cur.cdr = &Cons{car: r.readExpr(), cdr: &NIL}
 		cur = cur.cdr.(*Cons)
 	}
-	r.readChar()  // skip ')'
+	r.readChar() // skip ')'
 	return lst
 }
 
@@ -60,7 +60,7 @@ func (r *Reader) readExpr() Expr {
 
 		case TerminatingMacro, NonTerminatingMacro:
 			if r.chr == '(' {
-				r.readChar()  // skip '('
+				r.readChar() // skip '('
 				return r.readList()
 			}
 			panic("got <macro>; not implemented")
