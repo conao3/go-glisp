@@ -23,24 +23,32 @@ func (r *Reader) readChar() {
 	r.readPosition += 1
 }
 
-func (r *Reader) readList() []string {
-	var list []string
+func (r *Reader) readList() Expr {
+	if r.chr == ')' {
+		r.readChar()  // skip ')'
+		return NIL
+	}
+
+	lst := Cons{car: r.readExpr(), cdr: NIL}
+	cur := lst
 	for r.chr != ')' {
-		list = append(list, r.readExpr()...)
+		cur.cdr = Cons{car: r.readExpr(), cdr: NIL}
+		cur = cur.cdr.(Cons)
 	}
 	r.readChar()  // skip ')'
-	return list
+	return &lst
 }
 
-func (r *Reader) readSymbol() string {
+func (r *Reader) readSymbol() Expr {
 	pos := r.position
 	for GetSyntaxType(r.chr) == Constituent {
 		r.readChar()
 	}
-	return r.input[pos:r.position]
+	name := r.input[pos:r.position]
+	return &Symbol{name: name}
 }
 
-func (r *Reader) readExpr() []string {
+func (r *Reader) readExpr() Expr {
 	for r.chr != 0 {
 		switch GetSyntaxType(r.chr) {
 		case Invalid:
@@ -64,12 +72,12 @@ func (r *Reader) readExpr() []string {
 			panic("got <multiple escape>; not implemented")
 
 		case Constituent:
-			return []string{r.readSymbol()}
+			return r.readSymbol()
 		}
 	}
 	panic("Unexpected EOF")
 }
 
-func (r *Reader) Read() []string {
+func (r *Reader) Read() Expr {
 	return r.readExpr()
 }
