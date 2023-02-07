@@ -23,6 +23,19 @@ func (r *Reader) readChar() {
 	r.readPosition += 1
 }
 
+func (r *Reader) peakChar() byte {
+	if r.readPosition >= len(r.input) {
+		return 0
+	}
+	return r.input[r.readPosition]
+}
+
+func (r *Reader) skipWhitespace() {
+	for GetSyntaxType(r.chr) == Whitespace {
+		r.readChar()
+	}
+}
+
 func (r *Reader) readList() Expr {
 	if r.chr == ')' {
 		r.readChar() // skip ')'
@@ -31,9 +44,32 @@ func (r *Reader) readList() Expr {
 
 	lst := &Cons{car: r.readExpr(), cdr: &NIL}
 	cur := lst
+
+	r.skipWhitespace()
+
+L:
 	for r.chr != ')' {
 		cur.cdr = &Cons{car: r.readExpr(), cdr: &NIL}
 		cur = cur.cdr.(*Cons)
+
+		r.skipWhitespace()
+		switch r.chr {
+		case 0:
+			panic("Unexpected EOF")
+		case '.':
+			if GetSyntaxType(r.peakChar()) == Whitespace {
+				r.readChar() // skip '.'
+
+				cur.cdr = r.readExpr()
+
+				r.skipWhitespace()
+				if r.chr != ')' {
+					panic("Expected ')'")
+				}
+
+				break L
+			}
+		}
 	}
 	r.readChar() // skip ')'
 	return lst

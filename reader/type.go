@@ -53,6 +53,10 @@ func (c *Cons) String() string {
 		if cur.cdr == &NIL {
 			break
 		}
+		if atom, ok := cur.cdr.(Atom); ok {
+			fmt.Fprint(&buf, " . ", atom)
+			break
+		}
 		fmt.Fprint(&buf, " ")
 		cur = cur.cdr.(*Cons)
 	}
