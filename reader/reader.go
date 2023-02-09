@@ -1,5 +1,9 @@
 package reader
 
+import (
+	"github.com/conao3/go-glisp/types"
+)
+
 type Reader struct {
 	input        string
 	position     int
@@ -36,21 +40,21 @@ func (r *Reader) skipWhitespace() {
 	}
 }
 
-func (r *Reader) readList() Expr {
+func (r *Reader) readList() types.Expr {
 	if r.chr == ')' {
 		r.readChar() // skip ')'
-		return &NIL
+		return &types.NIL
 	}
 
-	lst := &Cons{car: r.readExpr(), cdr: &NIL}
+	lst := &types.Cons{Car: r.readExpr(), Cdr: &types.NIL}
 	cur := lst
 
 	r.skipWhitespace()
 
 L:
 	for r.chr != ')' {
-		cur.cdr = &Cons{car: r.readExpr(), cdr: &NIL}
-		cur = cur.cdr.(*Cons)
+		cur.Cdr = &types.Cons{Car: r.readExpr(), Cdr: &types.NIL}
+		cur = cur.Cdr.(*types.Cons)
 
 		r.skipWhitespace()
 		switch r.chr {
@@ -60,7 +64,7 @@ L:
 			if GetSyntaxType(r.peakChar()) == Whitespace {
 				r.readChar() // skip '.'
 
-				cur.cdr = r.readExpr()
+				cur.Cdr = r.readExpr()
 
 				r.skipWhitespace()
 				if r.chr != ')' {
@@ -75,16 +79,16 @@ L:
 	return lst
 }
 
-func (r *Reader) readSymbol() Expr {
+func (r *Reader) readSymbol() types.Expr {
 	pos := r.position
 	for GetSyntaxType(r.chr) == Constituent {
 		r.readChar()
 	}
 	name := r.input[pos:r.position]
-	return &Symbol{name: name}
+	return &types.Symbol{Name: name}
 }
 
-func (r *Reader) readExpr() Expr {
+func (r *Reader) readExpr() types.Expr {
 	for r.chr != 0 {
 		switch GetSyntaxType(r.chr) {
 		case Invalid:
@@ -114,6 +118,6 @@ func (r *Reader) readExpr() Expr {
 	panic("Unexpected EOF")
 }
 
-func (r *Reader) Read() Expr {
+func (r *Reader) Read() types.Expr {
 	return r.readExpr()
 }
