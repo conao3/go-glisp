@@ -17,13 +17,13 @@ type Atom interface {
 
 type Int struct {
 	Atom
-	value int
+	Value int
 }
 
 func (i *Int) isExpr() {}
 func (i *Int) isAtom() {}
 func (i *Int) String() string {
-	return fmt.Sprintf("%d", i.value)
+	return fmt.Sprintf("%d", i.Value)
 }
 
 type Symbol struct {

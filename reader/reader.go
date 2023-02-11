@@ -1,6 +1,9 @@
 package reader
 
 import (
+	"regexp"
+	"strconv"
+
 	"github.com/conao3/go-glisp/types"
 )
 
@@ -85,6 +88,13 @@ func (r *Reader) readSymbol() types.Expr {
 		r.readChar()
 	}
 	name := r.input[pos:r.position]
+	if regexp.MustCompile(`[0-9]+`).Match([]byte(name)) {
+		num, err := strconv.Atoi(name)
+		if err != nil {
+			panic(err)
+		}
+		return &types.Int{Value: num}
+	}
 	return &types.Symbol{Name: name}
 }
 
