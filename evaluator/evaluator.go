@@ -53,12 +53,12 @@ func Eval(expr types.Expr, env *types.Environment) types.Expr {
 			case "cond":
 				cur := expr.Cdr
 				for {
-					if c, ok := cur.(*types.Symbol); ok && c.Name == "nil" {
+					if c, ok := cur.(*types.Symbol); ok && c == &types.NIL {
 						return &types.NIL
 					}
 					cur_ := cur.(*types.Cons)
 					pair := cur_.Car.(*types.Cons)
-					if r, ok := Eval(pair.Car, env).(*types.Symbol); ok && r.Name != "nil" {
+					if r, ok := Eval(pair.Car, env).(*types.Symbol); ok && r != &types.NIL {
 						return Eval(pair.Cdr.(*types.Cons).Car, env)
 					}
 					cur = cur_.Cdr

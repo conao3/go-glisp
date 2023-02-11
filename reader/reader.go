@@ -88,12 +88,19 @@ func (r *Reader) readSymbol() types.Expr {
 		r.readChar()
 	}
 	name := r.input[pos:r.position]
+
 	if regexp.MustCompile(`[0-9]+`).Match([]byte(name)) {
 		num, err := strconv.Atoi(name)
 		if err != nil {
 			panic(err)
 		}
 		return &types.Int{Value: num}
+	}
+	if name == "t" {
+		return &types.T
+	}
+	if name == "nil" {
+		return &types.NIL
 	}
 	return &types.Symbol{Name: name}
 }
