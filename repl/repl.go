@@ -3,8 +3,11 @@ package repl
 import (
 	"bufio"
 	"fmt"
-	"github.com/conao3/go-glisp/reader"
 	"io"
+
+	"github.com/conao3/go-glisp/evaluator"
+	"github.com/conao3/go-glisp/reader"
+	"github.com/conao3/go-glisp/types"
 )
 
 const PROMPT = "glisp> "
@@ -23,6 +26,7 @@ func Start(in io.Reader, out io.Writer, stage Stage) {
 	}
 
 	scanner := bufio.NewScanner(in)
+	env := types.NewEnvironment()
 
 	for {
 		fmt.Printf(PROMPT)
@@ -40,8 +44,10 @@ func Start(in io.Reader, out io.Writer, stage Stage) {
 			fmt.Printf("%+v\n", exp)
 		}
 
+		res := evaluator.Eval(exp, env)
+
 		if stage == StageEvaluator {
-			panic("not implemented")
+			fmt.Printf("%+v\n", res)
 		}
 	}
 }
