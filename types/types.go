@@ -71,22 +71,36 @@ var (
 
 type Environment struct {
 	outer *Environment
-	store map[string]Expr
+	values map[string]Expr
+	functions map[string]Expr
 }
 
 func NewEnvironment() *Environment {
-	return &Environment{store: make(map[string]Expr)}
+	return &Environment{values: make(map[string]Expr)}
 }
 
-func (e *Environment) Get(name string) (Expr, bool) {
-	val, ok := e.store[name]
+func (e *Environment) GetValue(name string) (Expr, bool) {
+	val, ok := e.values[name]
 	if !ok && e.outer != nil {
-		return e.outer.Get(name)
+		return e.outer.GetValue(name)
 	}
 	return val, ok
 }
 
-func (e *Environment) Set(name string, val Expr) Expr {
-	e.store[name] = val
+func (e *Environment) SetValue(name string, val Expr) Expr {
+	e.values[name] = val
+	return val
+}
+
+func (e *Environment) GetFunction(name string) (Expr, bool) {
+	val, ok := e.functions[name]
+	if !ok && e.outer != nil {
+		return e.outer.GetFunction(name)
+	}
+	return val, ok
+}
+
+func (e *Environment) SetFunction(name string, val Expr) Expr {
+	e.functions[name] = val
 	return val
 }

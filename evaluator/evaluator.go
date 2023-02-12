@@ -7,7 +7,7 @@ import (
 func Eval(expr types.Expr, env *types.Environment) types.Expr {
 	switch expr := expr.(type) {
 	case *types.Symbol:
-		r, ok := env.Get(expr.Name)
+		r, ok := env.GetValue(expr.Name)
 		if !ok {
 			panic("undefined symbol")
 		}
@@ -65,6 +65,20 @@ func Eval(expr types.Expr, env *types.Environment) types.Expr {
 				}
 			case "quote":
 				return expr.Cdr.(*types.Cons).Car
+			case "set":
+				sym_ := expr.Cdr.(*types.Cons).Car
+				val_ := expr.Cdr.(*types.Cons).Cdr.(*types.Cons).Car
+				sym := Eval(sym_, env).(*types.Symbol)
+				val := Eval(val_, env)
+				env.SetValue(sym.Name, val)
+				return val
+			case "fset":
+				sym_ := expr.Cdr.(*types.Cons).Car
+				val_ := expr.Cdr.(*types.Cons).Cdr.(*types.Cons).Car
+				sym := Eval(sym_, env).(*types.Symbol)
+				val := Eval(val_, env)
+				env.SetFunction(sym.Name, val)
+				return val
 			default:
 				panic("not implemented")
 			}
