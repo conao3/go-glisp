@@ -70,15 +70,15 @@ var (
 )
 
 type Environment struct {
-	outer *Environment
-	values map[string]Expr
+	outer     *Environment
+	values    map[string]Expr
 	functions map[string]Expr
 }
 
 func NewEnvironment() *Environment {
 	return &Environment{
-		outer: nil,
-		values: make(map[string]Expr),
+		outer:     nil,
+		values:    make(map[string]Expr),
 		functions: make(map[string]Expr),
 	}
 }

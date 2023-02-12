@@ -4,7 +4,6 @@ import (
 	"github.com/conao3/go-glisp/types"
 )
 
-
 func extendedFunctionEnv(arg_syms_ *types.Cons, args_ *types.Cons, env *types.Environment) *types.Environment {
 	extended_env := types.NewEnclosedEnvironment(env)
 
