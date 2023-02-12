@@ -76,7 +76,17 @@ type Environment struct {
 }
 
 func NewEnvironment() *Environment {
-	return &Environment{values: make(map[string]Expr)}
+	return &Environment{
+		outer: nil,
+		values: make(map[string]Expr),
+		functions: make(map[string]Expr),
+	}
+}
+
+func NewEnclosedEnvironment(outer *Environment) *Environment {
+	env := NewEnvironment()
+	env.outer = outer
+	return env
 }
 
 func (e *Environment) GetValue(name string) (Expr, bool) {

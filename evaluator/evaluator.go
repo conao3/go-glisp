@@ -83,7 +83,42 @@ func Eval(expr types.Expr, env *types.Environment) types.Expr {
 				panic("not implemented")
 			}
 		case *types.Cons:
-			panic("not implemented")
+			switch caar := car.Car.(type) {
+			case *types.Symbol:
+				switch caar.Name {
+				case "lambda":
+					arg_syms := car.Cdr.(*types.Cons).Car.(*types.Cons)
+					body := car.Cdr.(*types.Cons).Cdr.(*types.Cons).Car
+					args_ := expr.Cdr.(*types.Cons)
+
+					extended_env := types.NewEnclosedEnvironment(env)
+
+					for {
+						arg_sym_ := arg_syms.Car
+						arg_ := args_.Car
+
+						arg_sym := arg_sym_.(*types.Symbol)
+						arg := Eval(arg_, env)
+
+						extended_env.SetValue(arg_sym.Name, arg)
+
+						if arg_syms.Cdr == &types.NIL && args_.Cdr == &types.NIL {
+							break
+						}
+						if arg_syms.Cdr == &types.NIL || args_.Cdr == &types.NIL {
+							panic("argument length mismatch")
+						}
+						arg_syms = arg_syms.Cdr.(*types.Cons)
+						args_ = args_.Cdr.(*types.Cons)
+					}
+
+					return Eval(body, extended_env)
+				default:
+					panic("not implemented")
+				}
+			default:
+				panic("not implemented")
+			}
 		default:
 			panic("unreachable")
 		}
