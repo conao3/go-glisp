@@ -29,6 +29,19 @@ func extendedFunctionEnv(arg_syms_ *types.Cons, args_ *types.Cons, env *types.En
 	return extended_env
 }
 
+var builtin = map[string]func(args *types.Cons, env *types.Environment) types.Expr{
+	"atom":   doAtom,
+	"eq":     doEq,
+	"car":    doCar,
+	"cdr":    doCdr,
+	"cons":   doCons,
+	"cond":   doCond,
+	"quote":  doQuote,
+	"lambda": doLambda,
+	"set":    doSet,
+	"fset":   doFset,
+}
+
 func Eval(expr types.Expr, env *types.Environment) types.Expr {
 	switch expr := expr.(type) {
 	case *types.Symbol:
@@ -42,76 +55,8 @@ func Eval(expr types.Expr, env *types.Environment) types.Expr {
 	case *types.Cons:
 		switch car := expr.Car.(type) {
 		case *types.Symbol:
-			switch car.Name {
-			case "atom":
-				cadr := expr.Cdr.(*types.Cons).Car
-				_, ok := Eval(cadr, env).(types.Atom)
-				if ok {
-					return &types.T
-				} else {
-					return &types.NIL
-				}
-			case "eq":
-				lhs := expr.Cdr.(*types.Cons).Car
-				rhs := expr.Cdr.(*types.Cons).Cdr.(*types.Cons).Car
-				lhs_atom, lhs_ok := Eval(lhs, env).(*types.Symbol)
-				rhs_atom, rhs_ok := Eval(rhs, env).(*types.Symbol)
-				if lhs_ok && rhs_ok {
-					if lhs_atom.Name == rhs_atom.Name {
-						return &types.T
-					} else {
-						return &types.NIL
-					}
-				} else {
-					return &types.NIL
-				}
-			case "car":
-				cadr := expr.Cdr.(*types.Cons).Car
-				return Eval(cadr, env).(*types.Cons).Car
-			case "cdr":
-				cadr := expr.Cdr.(*types.Cons).Car
-				return Eval(cadr, env).(*types.Cons).Cdr
-			case "cons":
-				lhs := expr.Cdr.(*types.Cons).Car
-				rhs := expr.Cdr.(*types.Cons).Cdr.(*types.Cons).Car
-				return &types.Cons{Car: Eval(lhs, env), Cdr: Eval(rhs, env)}
-			case "cond":
-				cur := expr.Cdr
-				for {
-					if c, ok := cur.(*types.Symbol); ok && c == &types.NIL {
-						return &types.NIL
-					}
-					cur_ := cur.(*types.Cons)
-					pair := cur_.Car.(*types.Cons)
-					if r, ok := Eval(pair.Car, env).(*types.Symbol); ok && r != &types.NIL {
-						return Eval(pair.Cdr.(*types.Cons).Car, env)
-					}
-					cur = cur_.Cdr
-				}
-			case "quote":
-				return expr.Cdr.(*types.Cons).Car
-			case "lambda":
-				return expr
-			case "set":
-				sym_ := expr.Cdr.(*types.Cons).Car
-				val_ := expr.Cdr.(*types.Cons).Cdr.(*types.Cons).Car
-				sym := Eval(sym_, env).(*types.Symbol)
-				val := Eval(val_, env)
-				env.SetValue(sym.Name, val)
-				return val
-			case "fset":
-				sym_ := expr.Cdr.(*types.Cons).Car
-				val_ := expr.Cdr.(*types.Cons).Cdr.(*types.Cons).Car
-				sym := Eval(sym_, env).(*types.Symbol)
-				val := Eval(val_, env)
-				env.SetFunction(sym.Name, val)
-				return val
-			default:
-				fn, ok := env.GetFunction(car.Name)
-				if !ok {
-					panic("undefined function")
-				}
-
+			fn, ok := env.GetFunction(car.Name)
+			if ok {
 				if fn.(*types.Cons).Car.(*types.Symbol).Name != "lambda" {
 					panic("this is not a function")
 				}
@@ -123,6 +68,13 @@ func Eval(expr types.Expr, env *types.Environment) types.Expr {
 
 				return Eval(body, extended_env)
 			}
+
+			fn_builtin, ok_builtin := builtin[car.Name]
+			if ok_builtin {
+				return fn_builtin(expr.Cdr.(*types.Cons), env)
+			}
+
+			panic("undefined function")
 		case *types.Cons:
 			switch caar := car.Car.(type) {
 			case *types.Symbol:
