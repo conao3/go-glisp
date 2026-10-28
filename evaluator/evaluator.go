@@ -29,17 +29,21 @@ func extendedFunctionEnv(arg_syms_ *types.Cons, args_ *types.Cons, env *types.En
 	return extended_env
 }
 
-var builtin = map[string]func(args *types.Cons, env *types.Environment) types.Expr{
-	"atom":   doAtom,
-	"eq":     doEq,
-	"car":    doCar,
-	"cdr":    doCdr,
-	"cons":   doCons,
-	"cond":   doCond,
-	"quote":  doQuote,
-	"lambda": doLambda,
-	"set":    doSet,
-	"fset":   doFset,
+var builtin map[string]func(args *types.Cons, env *types.Environment) types.Expr
+
+func init() {
+	builtin = map[string]func(args *types.Cons, env *types.Environment) types.Expr{
+		"atom":   doAtom,
+		"eq":     doEq,
+		"car":    doCar,
+		"cdr":    doCdr,
+		"cons":   doCons,
+		"cond":   doCond,
+		"quote":  doQuote,
+		"lambda": doLambda,
+		"set":    doSet,
+		"fset":   doFset,
+	}
 }
 
 func Eval(expr types.Expr, env *types.Environment) types.Expr {
